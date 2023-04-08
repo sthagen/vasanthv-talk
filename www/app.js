@@ -19,19 +19,28 @@ const App = Vue.createApp({
 			audioEnabled: true,
 			videoEnabled: true,
 			screenShareEnabled: false,
-			showIntro: true,
 			showChat: false,
 			showSettings: false,
-			hideToolbar: false,
+			hideToolbar: true,
 			selectedAudioDeviceId: "",
 			selectedVideoDeviceId: "",
 			name: window.localStorage.name,
+			nameError: false,
 			typing: "",
 			chats: [],
+			callInitiated: false,
 			callEnded: false,
 		};
 	},
 	methods: {
+		initiateCall() {
+			if (this.name) {
+				this.callInitiated = true;
+				window.initiateCall();
+			} else {
+				this.nameError = true;
+			}
+		},
 		copyURL() {
 			navigator.clipboard.writeText(this.roomLink).then(
 				() => {
@@ -56,7 +65,10 @@ const App = Vue.createApp({
 		toggleSelfVideoMirror() {
 			document.querySelector("#videos .video #selfVideo").classList.toggle("mirror");
 		},
-		nameToLocalStorage() {
+		updateName() {
+			window.localStorage.name = this.name;
+		},
+		updateNameAndPublish() {
 			window.localStorage.name = this.name;
 			this.updateUserData("peerName", this.name);
 		},
@@ -97,6 +109,11 @@ const App = Vue.createApp({
 					screenStream.getVideoTracks()[0].onended = function () {
 						if (App.screenShareEnabled) App.screenShareToggle();
 					};
+					try {
+						if (cabin) {
+							cabin.event("screen-share-"+App.screenShareEnabled);
+						}
+					} catch (e) {}			
 				})
 				.catch((e) => {
 					alert("Unable to share screen. Please use a supported browser.");
