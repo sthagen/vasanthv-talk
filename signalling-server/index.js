@@ -1,8 +1,26 @@
-/*
-Note: This socket connection is used a signalling server as WebRTC does not support discovery of other peers. 
-User's audio, video & chat messages does not use this socket.
-*/
+/**
+ * A simple signalling server implementation using socket.io.
+ * This socket connection is used a signalling server as WebRTC does not support discovery of other peers.
+ * User's audio, video & chat messages does not use this socket.
+ */
+
+const express = require("express");
+const http = require("http");
+const app = express();
+const server = http.createServer(app);
+const io = require("socket.io")(server, {
+	cors: { origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(",") : "*" },
+});
+
 const util = require("util");
+
+// Get PORT from env variable else assign 3000 for development
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, null, () => {
+	console.log("Talk server started");
+	console.log({ port: PORT, node_version: process.versions.node });
+});
 
 const channels = {};
 const sockets = {};
@@ -11,7 +29,7 @@ const peers = {};
 const options = { depth: null, colors: true };
 
 const signallingServer = (socket) => {
-	const socketHostName = socket.handshake.headers.host.split(":")[0];
+	const clientAddress = socket.handshake.address;
 
 	socket.channels = {};
 	sockets[socket.id] = socket;
@@ -27,7 +45,7 @@ const signallingServer = (socket) => {
 
 	socket.on("join", (config) => {
 		console.log("[" + socket.id + "] join ", config);
-		const channel = socketHostName + config.channel;
+		const channel = clientAddress + config.channel;
 
 		// Already Joined
 		if (channel in socket.channels) return;
@@ -60,7 +78,7 @@ const signallingServer = (socket) => {
 	});
 
 	socket.on("updateUserData", async (config) => {
-		const channel = socketHostName + config.channel;
+		const channel = clientAddress + config.channel;
 		const key = config.key;
 		const value = config.value;
 		for (let id in peers[channel]) {
@@ -113,4 +131,4 @@ const signallingServer = (socket) => {
 	});
 };
 
-module.exports = signallingServer;
+io.sockets.on("connection", signallingServer);

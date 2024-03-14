@@ -16,44 +16,48 @@
 		/>
 		<meta name="application-name" content="Talk" />
 		<!-- Meta data for link fetching -->
-		<meta property="og:url" content="https://tlk.li" />
-		<meta property="og:image" content="https://tlk.li/og-image.png" />
+		<meta property="og:url" content="https://vasanthv.github.io/talk/" />
+		<meta property="og:image" content="https://vasanthv.github.io/talk/icons/icon.png" />
 		<meta property="og:title" content="Talk - Free video calling for the web" />
 		<meta
 			property="og:description"
 			content="A free, peer-to-peer, encrypted, open-source video calling for the web. No sign ups. No downloads."
 		/>
 
-		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-		<link rel="icon" href="/favicon.svg" />
-		<link rel="stylesheet" href="/app.css" />
+		<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+		<link rel="icon" href="icons/favicon.svg" />
+		<link rel="stylesheet" href="styles.css" />
 		<script defer src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
-		<script defer src="/socket.io/socket.io.js"></script>
-		<script defer src="/vue.global.prod.js"></script>
-		<script defer src="app.js"></script>
+		<script
+			src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+			integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+			crossorigin="anonymous"
+		></script>
+		<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+		<script defer src="script.js"></script>
 		<script defer src="webrtc.js"></script>
 		<title>Talk - Free video calling for the web</title>
-		<!-- ANALYTICS_SCRIPT -->
+
+		<!-- ANALYTICS_SCRIPT: Please remove it for your use -->
+		<script async defer src="https://scripts.withcabin.com/hello.js"></script>
 	</head>
 
 	<body>
-		<header style="background-color: #e74c3c; color: white; padding: 0.5rem">
-			Talk (tlk.li) will be discontinued from December 20, 2023. If needed, you can spin up your own server using our
-			open-source code. The source code will continue to be available under the MIT license @
-			<a href="https://github.com/vasanthv/talk" target="_blank">https://github.com/vasanthv/talk</a>. I am deeply sorry
-			for any inconvenience caused.
-		</header>
 		<section id="blanket"></section>
 		<section id="videos"></section>
 
 		<main id="app">
 			<div id="appWrap" v-bind:style="'display:block;'">
 				<div id="intro" v-if="!callInitiated && !showChat && !showSettings">
-					<h3>You are about to enter a video call.</h3>
-					<p>Talk is a free, peer-to-peer, encrypted, open-source video calling for the web.</p>
+					<h1>Talk</h1>
+					<p>A free, peer-to-peer, encrypted, open-source video calling for the web.</p>
 					<p>
-						<label v-bind:class="(nameError && !name ? 'red' : '')">Please enter your name</label>
-						<input type="text" v-model="name" v-on:keyup="updateName" placeholder="Your name" />
+						<label for="roomId">Room Id:</label>
+						<input type="text" id="roomId" v-model="roomId" placeholder="Enter a room id" />
+					</p>
+					<p>
+						<label for="yourName">Your name</label>
+						<input type="text" id="yourName" v-model="name" v-on:keyup="updateName" placeholder="Enter your name" />
 					</p>
 					<br />
 
