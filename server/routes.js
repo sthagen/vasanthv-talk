@@ -1,4 +1,5 @@
-const { isValidChannelName } = require("./utils");
+const { isValidRoomName, isPublicRoomName, randomRoomName, randomPublicRoomName, unusedRoomName } = require("./utils");
+const { getPublicRooms, isRoomLive } = require("./signalling-server");
 
 const router = require("express").Router();
 
@@ -10,6 +11,29 @@ const STATIC_VIEWS = {
 // Route: Home page
 router.get("/", (req, res) => res.render("index", { page: "index", title: "A free video chat for the web." }));
 
+// Route: Bounce to a fresh, empty private room.
+router.get("/random", (req, res) => {
+	const room = unusedRoomName(randomRoomName, isRoomLive);
+	res.redirect(`/${room}`);
+});
+
+// Route: Bounce to a fresh, empty public room with a name worth saying out loud.
+router.get("/@random", (req, res) => {
+	const room = unusedRoomName(randomPublicRoomName, (name) => isRoomLive(`@${name}`));
+	res.redirect(`/@${room}`);
+});
+
+// Route: Public rooms page. Rooms whose id starts with "@" are discoverable here.
+router.get("/public", (req, res) =>
+	res.render("public", { page: "public", title: "Public rooms", rooms: getPublicRooms() })
+);
+
+// Route: Public rooms as JSON, used by the /public page to keep the list fresh.
+router.get("/public.json", (req, res) => {
+	res.set("Cache-Control", "no-store");
+	res.json({ rooms: getPublicRooms() });
+});
+
 // MIddleware: Static views (terms, privacy, etc.)
 router.use("/:view", (req, res, next) => {
 	const view = req.params.view;
@@ -20,13 +44,13 @@ router.use("/:view", (req, res, next) => {
 });
 
 // Route: Room page (dynamic)
-router.get("/:channel", (req, res) => {
-	const channel = req.params.channel;
-	if (!isValidChannelName(channel)) {
-		return res.status(400).render("invalid", { page: "invalid-channel", title: "Invalid channel" });
+router.get("/:room", (req, res) => {
+	const room = req.params.room;
+	if (!isValidRoomName(room)) {
+		return res.status(400).render("invalid", { page: "invalid-room", title: "Invalid room" });
 	}
 
-	res.render("channel", { page: "channel", title: channel });
+	res.render("room", { page: "room", title: room, isPublic: isPublicRoomName(room) });
 });
 
 // Route: Catch-all for 404 errors

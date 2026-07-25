@@ -5,11 +5,11 @@
   <meta name="keywords" content="group video chat, video communication, multiparty video chat, video chat, webrtc, peer to peer, p2p" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="application-name" content="Hello" />
+  <meta name="application-name" content="Ahey" />
   <meta name="theme-color" content="#000000" />
 
   <!-- Meta data for link fetching -->
-  <meta property="og:title" content="Hello" />
+  <meta property="og:title" content="Ahey" />
   <meta property="og:description" content="A free video chat for the web. No sign ups. No downloads. 100% free." />
 
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
@@ -17,15 +17,24 @@
   <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
   <link rel="manifest" href="/manifest.json" />
 
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/style.css" />
 
-  <% if(page==="channel" ) { %>
-  <script defer src="/socket.io/socket.io.js"></script>
+  <% if(page==="room" || page==="public" ) { %>
   <script defer src="/vue.global.prod.js"></script>
-  <script defer src="/ice-config.js"></script>
-  <script defer src="/peer.js"></script>
-  <script defer src="/app.js"></script>
   <% } %>
 
-  <title>Hello / <%= title %></title>
+  <% if(page==="room" ) { %>
+  <link rel="stylesheet" href="/room.css" />
+  <script defer src="/socket.io/socket.io.js"></script>
+  <script defer src="/ice-config.js"></script>
+  <script defer src="/peer.js"></script>
+  <script defer src="/room.js"></script>
+  <% } %>
+
+  <title>Ahey / <%= title %></title>
+
+  <% if(process.env.NODE_ENV === "production") { %>
+  <!-- A privacy first web analytics-->
+  <script async src="https://cabin.ahey.net/hello.js"></script>
+  <% } %>
 </head>
